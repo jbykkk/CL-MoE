@@ -8,7 +8,7 @@ from dataclasses import dataclass, field
 import copy
 
 import numpy as np
-import tensorflow as tf
+import datetime
 
 import torch
 import torch.nn as nn
@@ -397,23 +397,22 @@ class CLMoEMOELoraLinear(nn.Linear, CLMoEMOELoraLayer):
 
             router = torch.softmax(router, dim=-1)
 
-            with open("/your/catalogue/CLMoE/task.txt", "r" , encoding="utf-8") as f:
+            with open("/home/data1/lyk/Experiments/CL-MoE/task.txt", "r" , encoding="utf-8") as f:
                 task = f.read()
 
             current_time = datetime.datetime.now()
 
             current_second = current_time.second
             if current_second == 30:
-                router_topk_values, router_topk_indices = torch.topk(router, 2, dim=-1)  
+                router_topk_values, router_topk_indices = torch.topk(router, 2, dim=-1)
                 invalid_mask = (router_topk_values[:,:,0] == router_topk_values[:,:,1])
                 router_topk_indices[invalid_mask] = -1
                 flattened_tensor = router_topk_indices.cpu().flatten()
                 unique_values, counts = np.unique(flattened_tensor, return_counts=True)
                 txt_file_path = "value_counts_" + task + ".txt"
-            
-            with open(txt_file_path, "a") as txt_file:
-                for value, count in zip(unique_values, counts):
-                    txt_file.write(f"{value}:{count}\n")
+                with open(txt_file_path, "a") as txt_file:
+                    for value, count in zip(unique_values, counts):
+                        txt_file.write(f"{value}:{count}\n")
             
             # alpha = 0.5
             # arr = [] # The contribution of top-2 experts infered from the statistics

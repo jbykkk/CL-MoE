@@ -12,7 +12,7 @@ else
 fi
 
 if [ ! -n "$2" ] ;then
-    MODELPATH='/your/catalogue/CLMoE/checkpoints/CL4VQA/subcategory/llava-1.5-7b-lora'
+    MODELPATH='/home/data1/lyk/Experiments/CL-MoE/checkpoints/CL4VQA/subcategory/llava-1.5-7b-lora'
 else
     MODELPATH=$2
 fi
@@ -22,9 +22,9 @@ RESULT_DIR="./results/CLMoE/action"
 for IDX in $(seq 0 $((CHUNKS-1))); do
     CUDA_VISIBLE_DEVICES=${GPULIST[$IDX]} python -m llava.eval.CLMoE.model_vqa_cc_instruction \
         --model-path $MODELPATH \
-        --model-base /your/catalogue/CLMoE/checkpoint/vicuna-7b-v1.5 \
-        --question-file /your/catalogue/CLMoE/CL4VQA/test/test_q_action.json \
-        --image-folder /your/catalogue/CLMoE/data \
+        --model-base /home/data1/lyk/Experiments/CL-MoE/checkpoint/vicuna-7b-v1.5 \
+        --question-file /home/data1/lyk/Experiments/CL-MoE/CL4VQA/test/test_q_action.json \
+        --image-folder /home/data1/lyk/Experiments/CL-MoE/data \
         --answers-file $RESULT_DIR/$STAGE/${CHUNKS}_${IDX}.jsonl \
         --num-chunks $CHUNKS \
         --chunk-idx $IDX \
@@ -45,6 +45,6 @@ for IDX in $(seq 0 $((CHUNKS-1))); do
 done
 
 python llava/eval/CLMoE/eval_vqav2.py \
-    --annotation_file /your/catalogue/CLMoE/CL4VQA/test/test_q_action.json \
+    --annotation_file /home/data1/lyk/Experiments/CL-MoE/CL4VQA/test/test_q_action.json \
     --result-file $output_file \
     --output-dir $RESULT_DIR/$STAGE/output_result.jsonl \

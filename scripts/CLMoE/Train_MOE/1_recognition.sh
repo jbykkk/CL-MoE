@@ -13,12 +13,12 @@ deepspeed --include localhost:0,1 --master_port 29600 llava/train/train_mem_MOE.
     --deepspeed ./scripts/zero3_offload.json \
     --lora_enable True --lora_r 32 --lora_alpha 64 --mm_projector_lr 2e-5 \
     --expert_num 4 \
-    --model_name_or_path /your/catalogue/CLMoE/checkpoint/vicuna-7b-v1.5 \
-    --pretrain_mm_mlp_adapter /your/catalogue/CLMoE/checkpoint/llava-v1.5-mlp2x-336px-pretrain-vicuna-7b-v1.5/mm_projector.bin \
+    --model_name_or_path checkpoint/vicuna-7b-v1.5 \
+    --pretrain_mm_mlp_adapter checkpoint/llava-v1.5-mlp2x-336px-pretrain-vicuna-7b-v1.5/mm_projector.bin \
     --version $PROMPT_VERSION \
-    --data_path /your/catalogue/CLMoE/CL4VQA/train/train_q_recognition.json \
-    --image_folder /your/catalogue/CLMoE/data/ \
-    --vision_tower /your/catalogue/CLMoE/checkpoint/clip-vit-large-patch14-336 \
+    --data_path CL4VQA/train/train_q_recognition.json \
+    --image_folder data/ \
+    --vision_tower checkpoint/clip-vit-large-patch14-336 \
     --mm_projector_type mlp2x_gelu \
     --mm_vision_select_layer -2 \
     --mm_use_im_start_end False \

@@ -34,7 +34,7 @@ from llava import conversation as conversation_lib
 from llava.model import *
 from llava.mm_utils import tokenizer_image_token
 
-sys.path.append('~/CLMoE/')
+sys.path.append('/home/data1/lyk/Experiments/CL-MoE')
 
 from CLMoE.peft import PeftModel, TaskType, get_peft_model, CLMoEMOELoraConfig, WEIGHTS_NAME, set_peft_model_state_dict
 
@@ -807,7 +807,7 @@ def train():
     parser = transformers.HfArgumentParser(
         (ModelArguments, DataArguments, TrainingArguments))
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()
-    with open("/public1/home/jzhou/hty/CLMoE/task.txt", "w") as t:
+    with open("/home/data1/lyk/Experiments/CL-MoE/task.txt", "w") as t:
         t.write(model_args.task)
     local_rank = training_args.local_rank
     compute_dtype = (torch.float16 if training_args.fp16 else (torch.bfloat16 if training_args.bf16 else torch.float32))

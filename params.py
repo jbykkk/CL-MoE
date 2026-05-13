@@ -10,7 +10,7 @@ parser.add_argument("--task2", type=str, default="")
 args = parser.parse_args()
 
 # Load finetuned weights
-base_path = "/your/catalogue/CLMoE/checkpoints/CL4VQA"
+base_path = "/home/data1/lyk/Experiments/CL-MoE/checkpoints/CL4VQA"
 finetuned_model1_path = os.path.join(base_path, args.task1, "llava-1.5-7b-lora/adapter_model.bin")
 finetuned_model2_path = os.path.join(base_path, "Only_Pretrain_1.5_MOE_2", args.task2, "llava-1.5-7b-lora/adapter_model.bin")
 
@@ -25,8 +25,8 @@ def read_indices(file_path):
     with open(file_path, "r") as f:
         return [int(line.strip()) for line in f]
 
-index1 = read_indices(f"/your/catalogue/CLMoE/index_{args.task1}.txt")
-index2 = read_indices(f"/your/catalogue/CLMoE/index_{args.task2}.txt")
+index1 = read_indices(f"/home/data1/lyk/Experiments/CL-MoE/index_{args.task1}.txt")
+index2 = read_indices(f"/home/data1/lyk/Experiments/CL-MoE/index_{args.task2}.txt")
 
 # Determine indices that are only in task1
 exclusive_indices = [i for i in index1 if i not in index2]
