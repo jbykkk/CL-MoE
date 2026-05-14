@@ -31,6 +31,7 @@ deepspeed --include localhost:0,1 --master_port 29600 llava/train/train_mem_MOE.
     --per_device_train_batch_size 16 \
     --per_device_eval_batch_size 16 \
     --gradient_accumulation_steps 1 \
+    --max_steps 19 \
     --evaluation_strategy "no" \
     --save_strategy "steps" \
     --save_steps 50000 \
