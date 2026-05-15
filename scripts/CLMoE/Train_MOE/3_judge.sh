@@ -34,7 +34,7 @@ deepspeed --include localhost:0,1 --master_port 29600 llava/train/train_mem_MOE.
     --max_steps 266 \
     --evaluation_strategy "no" \
     --save_strategy "steps" \
-    --save_steps 50 \
+    --save_steps 50000 \
     --learning_rate 2e-4 \
     --weight_decay 0. \
     --warmup_ratio 0.03 \
