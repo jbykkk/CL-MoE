@@ -4,45 +4,30 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Environment & Sync
 
-This project uses **mutagen** for one-way file synchronization from local to a remote GPU server. Claude Code edits local files; mutagen propagates changes automatically.
+This project uses **git** to synchronize code between local and a remote GPU server.
 
-- **Sync name:** `clmoe`
-- **Local (Alpha):** `/Users/lyk/Documents/Projects/CL-MoE`
-- **Remote (Beta):** `scut:/home/data1/lyk/Experiments/CL-MoE`
-- **Sync is file-level only** — Claude Code cannot run commands on the remote server.
+- **Local:** `/Users/lyk/Documents/Projects/CL-MoE`
+- **Remote:** `scut:/home/data1/lyk/lyk/Experiments/CL-MoE`
+- **Git remote `kenny_dev`:** `https://github.com/jbykkk/CL-MoE`
+- **Claude Code cannot run commands on the remote server.**
 
-When providing commands that need execution (training, evaluation, installing packages, etc.), output them so the user can copy and run them on the remote server.
+## Code Sync Workflow
 
-## Mutagen Management
-
-```bash
-# Check sync status
-mutagen sync list
-
-# Pause sync (e.g., during batch local edits to avoid partial uploads)
-mutagen sync pause clmoe
-
-# Resume sync
-mutagen sync resume clmoe
-
-# Flush pending changes immediately
-mutagen sync flush clmoe
-```
-
-## Remote Server Workflow
-
-All training and evaluation runs on the remote server (`scut`). Typical workflow:
-
-1. Claude Code edits files locally → mutagen syncs to remote
-2. User runs commands on remote server via SSH
+1. Claude Code edits files locally → commit and push to `kenny_dev`
+2. User pulls on remote server: `git -c http.sslVerify=false pull kenny_dev main`
 3. Outputs/logs stay on remote; user shares relevant results back if needed
 
 When suggesting commands, prefix with `# Run on remote server:` and use paths matching the remote layout (`/home/data1/lyk/Experiments/CL-MoE/...`).
 
-## Conda Environment
+## Remote Server Setup
 
 Remote server uses conda environment `clmoe` (Python 3.10). Activate before running:
 
 ```bash
 conda activate clmoe
+export CUDA_HOME=/usr/local/cuda-12.0
+export HF_HUB_OFFLINE=1
 ```
+
+- `CUDA_HOME=/usr/local/cuda-12.0` — needed for DeepSpeed compilation (CUDA 11.7 doesn't support RTX 4090's compute_89)
+- `HF_HUB_OFFLINE=1` — prevents HuggingFace Hub timeout issues, all model files are already local
