@@ -5,8 +5,8 @@ tasks = ['recognition', 'location', 'judge', 'commonsense', 'count', 'action', '
 
 for task in tasks:
     annotation_file = f'CL4VQA/test/test_q_{task}.json'
-    result_file = f'results/CLMoE/{task}/Finetune/merge.jsonl'
-    output_file = f'results/CLMoE/{task}/Finetune/output_result.jsonl'
+    result_file = f'results/CLMoE/{task}/BaseModel/merge.jsonl'
+    output_file = f'results/CLMoE/{task}/BaseModel/output_result.jsonl'
 
     if not os.path.exists(annotation_file) or not os.path.exists(result_file):
         print(f'{task}: missing files, skipping')
@@ -21,5 +21,6 @@ for task in tasks:
 
     print(f'{task}: Samples={total}, Accuracy={accuracy:.2f}%')
 
+    os.makedirs(os.path.dirname(output_file), exist_ok=True)
     with open(output_file, 'w') as f:
         f.write(f'Samples: {total}\nAccuracy: {accuracy:.2f}%\n')

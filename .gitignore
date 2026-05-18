@@ -17,4 +17,6 @@ index_*.txt
 value_counts_*.txt
 task.txt
 
+results/
+
 1.py
