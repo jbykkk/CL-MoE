@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export CUDA_VISIBLE_DEVICES=0,1
+
 bash ./scripts/CLMoE/Eval/1_eval_recognition.sh
 bash ./scripts/CLMoE/Eval/2_eval_location.sh
 bash ./scripts/CLMoE/Eval/3_eval_judge.sh
