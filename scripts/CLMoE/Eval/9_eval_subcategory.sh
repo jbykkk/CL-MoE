@@ -12,7 +12,7 @@ else
 fi
 
 if [ ! -n "$2" ] ;then
-    MODELPATH='/home/data1/lyk/Experiments/CL-MoE/checkpoints/CL4VQA/subcategory/llava-1.5-7b-lora'
+    MODELPATH='/home/data1/lyk/Experiments/CL-MoE/checkpoints/CL4VQA/causal/llava-1.5-7b-lora'
 else
     MODELPATH=$2
 fi
