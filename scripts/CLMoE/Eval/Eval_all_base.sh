@@ -6,7 +6,16 @@
 export CUDA_VISIBLE_DEVICES=0,1
 
 STAGE='BaseModel'
-MODELPATH='/home/data1/lyk/Experiments/CL-MoE/checkpoint/llava-v1.5-mlp2x-336px-pretrain-vicuna-7b-v1.5'
+BASE_ADAPTER_DIR='/home/data1/lyk/Experiments/CL-MoE/checkpoint/llava-v1.5-mlp2x-336px-pretrain-vicuna-7b-v1.5'
+LORA_CONFIG_DIR='/home/data1/lyk/Experiments/CL-MoE/checkpoints/CL4VQA/recognition/llava-1.5-7b-lora'
+
+# Pretrained adapter dir only has mm_projector.bin; copy config.json from LoRA checkpoint
+if [ ! -f "$BASE_ADAPTER_DIR/config.json" ]; then
+    cp "$LORA_CONFIG_DIR/config.json" "$BASE_ADAPTER_DIR/config.json"
+    echo "Copied config.json to $BASE_ADAPTER_DIR"
+fi
+
+MODELPATH=$BASE_ADAPTER_DIR
 
 bash ./scripts/CLMoE/Eval/1_eval_recognition.sh $STAGE $MODELPATH
 bash ./scripts/CLMoE/Eval/2_eval_location.sh $STAGE $MODELPATH
