@@ -1,12 +1,17 @@
 import json
 import os
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--stage', type=str, default='Finetune', help='Subdirectory name (e.g. Finetune, BaseModel)')
+args = parser.parse_args()
 
 tasks = ['recognition', 'location', 'judge', 'commonsense', 'count', 'action', 'color', 'type', 'subcategory', 'causal']
 
 for task in tasks:
     annotation_file = f'CL4VQA/test/test_q_{task}.json'
-    result_file = f'results/CLMoE/{task}/BaseModel/merge.jsonl'
-    output_file = f'results/CLMoE/{task}/BaseModel/output_result.jsonl'
+    result_file = f'results/CLMoE/{task}/{args.stage}/merge.jsonl'
+    output_file = f'results/CLMoE/{task}/{args.stage}/output_result.jsonl'
 
     if not os.path.exists(annotation_file) or not os.path.exists(result_file):
         print(f'{task}: missing files, skipping')
