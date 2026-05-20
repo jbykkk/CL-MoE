@@ -90,11 +90,11 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--data-root", type=Path, default=Path("CL4VQA"))
     parser.add_argument("--results-root", type=Path, default=Path("results/CLMoE"))
-    parser.add_argument("--stage", action="append", default=["BaseModel", "Finetune"])
+    parser.add_argument("--stage", action="append")
     args = parser.parse_args()
 
     summarize_data(args.data_root)
-    for stage in args.stage:
+    for stage in args.stage or ["BaseModel", "Finetune"]:
         summarize_stage(args.results_root, args.data_root, stage)
 
 

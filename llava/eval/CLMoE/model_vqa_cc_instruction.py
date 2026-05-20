@@ -2,6 +2,7 @@ import argparse
 import torch
 import os
 import json
+import random
 from tqdm import tqdm
 import shortuuid
 from transformers import AutoTokenizer, AutoModelForCausalLM, AutoConfig, BitsAndBytesConfig
@@ -27,6 +28,39 @@ def get_chunk(lst, n, k):
     return chunks[k]
 
 
+def apply_image_eval_mode(questions, mode, seed):
+    if mode == "normal":
+        return questions
+    if mode != "shuffle" or len(questions) <= 1:
+        return questions
+
+    rng = random.Random(seed)
+    shuffled_images = [item["image"] for item in questions]
+    rng.shuffle(shuffled_images)
+
+    # Avoid the common no-op case for small or ordered lists.
+    if all(item["image"] == image for item, image in zip(questions, shuffled_images)):
+        shuffled_images = shuffled_images[1:] + shuffled_images[:1]
+
+    remapped = []
+    for item, image in zip(questions, shuffled_images):
+        item = dict(item)
+        item["eval_image"] = image
+        remapped.append(item)
+    return remapped
+
+
+def load_eval_image(image_processor, image_folder, image_file, mode):
+    if mode == "blank":
+        crop_size = getattr(image_processor, "crop_size", {"height": 336, "width": 336})
+        height = crop_size["height"] if isinstance(crop_size, dict) else crop_size
+        width = crop_size["width"] if isinstance(crop_size, dict) else crop_size
+        image = Image.new("RGB", (width, height), color=(0, 0, 0))
+    else:
+        image = Image.open(os.path.join(image_folder, image_file)).convert("RGB")
+    return image_processor.preprocess(image, return_tensors="pt")["pixel_values"][0]
+
+
 def eval_model(args):
     # Model
     disable_torch_init()
@@ -36,6 +70,7 @@ def eval_model(args):
 
     with open(os.path.expanduser(args.question_file), "r") as f:
         questions = json.load(f)
+    questions = apply_image_eval_mode(questions, args.image_eval_mode, args.shuffle_seed)
     questions = get_chunk(questions, args.num_chunks, args.chunk_idx)
     
     answers_file = os.path.expanduser(args.answers_file)
@@ -45,7 +80,7 @@ def eval_model(args):
     for line in tqdm(questions):
         count += 1
         idx = line["question_id"]
-        image_file = line["image"]
+        image_file = line.get("eval_image", line["image"])
         qs = line["text"]
         cur_prompt = qs
         if model.config.mm_use_im_start_end:
@@ -60,8 +95,7 @@ def eval_model(args):
 
         input_ids = tokenizer_image_token(prompt, tokenizer, IMAGE_TOKEN_INDEX, return_tensors='pt').unsqueeze(0).cuda()
 
-        image = Image.open(os.path.join(args.image_folder, image_file))
-        image_tensor = image_processor.preprocess(image, return_tensors='pt')['pixel_values'][0]
+        image_tensor = load_eval_image(image_processor, args.image_folder, image_file, args.image_eval_mode)
 
         stop_str = conv.sep if conv.sep_style != SeparatorStyle.TWO else conv.sep2
         keywords = [stop_str]
@@ -95,7 +129,11 @@ def eval_model(args):
                                    "text": outputs,
                                    "answer_id": ans_id,
                                    "model_id": model_name,
-                                   "metadata": {}}) + "\n")
+                                   "metadata": {
+                                       "image_eval_mode": args.image_eval_mode,
+                                       "source_image": line["image"],
+                                       "eval_image": image_file,
+                                   }}) + "\n")
         ans_file.flush()
     ans_file.close()
 
@@ -112,6 +150,8 @@ if __name__ == "__main__":
     parser.add_argument("--temperature", type=float, default=0)
     parser.add_argument("--top_p", type=float, default=None)
     parser.add_argument("--num_beams", type=int, default=1)
+    parser.add_argument("--image-eval-mode", type=str, default="normal", choices=["normal", "shuffle", "blank"])
+    parser.add_argument("--shuffle-seed", type=int, default=42)
     
     args = parser.parse_args()
 

@@ -17,6 +17,8 @@ else
     MODELPATH=$2
 fi
 
+IMAGE_EVAL_MODE=${3:-normal}
+
 RESULT_DIR="./results/CLMoE/location"
 
 for IDX in $(seq 0 $((CHUNKS-1))); do
@@ -29,7 +31,8 @@ for IDX in $(seq 0 $((CHUNKS-1))); do
         --num-chunks $CHUNKS \
         --chunk-idx $IDX \
         --temperature 0 \
-        --conv-mode vicuna_v1 &
+        --conv-mode vicuna_v1 \
+        --image-eval-mode $IMAGE_EVAL_MODE &
 done
 
 wait
