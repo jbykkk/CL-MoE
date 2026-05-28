@@ -26,12 +26,12 @@ deepspeed --include localhost:0,1 --master_port 29600 llava/train/train_mem_MOE.
     --image_aspect_ratio pad \
     --group_by_modality_length True \
     --bf16 True \
-    --output_dir ./checkpoints/CL4VQA/recognition/llava-1.5-7b-lora \
+    --output_dir ./checkpoints/CL4VQA_1_5/recognition/llava-1.5-7b-lora \
     --num_train_epochs 1 \
     --per_device_train_batch_size 4 \
     --per_device_eval_batch_size 4 \
     --gradient_accumulation_steps 4 \
-    --max_steps 241 \
+    --max_steps 482 \
     --evaluation_strategy "no" \
     --save_strategy "steps" \
     --save_steps 50000 \

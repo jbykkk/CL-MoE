@@ -7,12 +7,14 @@ from tqdm import tqdm
 parser = argparse.ArgumentParser()
 parser.add_argument("--task1", type=str, default="")
 parser.add_argument("--task2", type=str, default="")
+parser.add_argument("--base-path", type=str, default="/home/data1/lyk/Experiments/CL-MoE/checkpoints/CL4VQA")
+parser.add_argument("--temp-folder", type=str, default="Only_Pretrain_1.5_MOE_2")
 args = parser.parse_args()
 
 # Load finetuned weights
-base_path = "/home/data1/lyk/Experiments/CL-MoE/checkpoints/CL4VQA"
+base_path = args.base_path
 finetuned_model1_path = os.path.join(base_path, args.task1, "llava-1.5-7b-lora/adapter_model.bin")
-finetuned_model2_path = os.path.join(base_path, "Only_Pretrain_1.5_MOE_2", args.task2, "llava-1.5-7b-lora/adapter_model.bin")
+finetuned_model2_path = os.path.join(base_path, args.temp_folder, args.task2, "llava-1.5-7b-lora/adapter_model.bin")
 
 finetuned_state_dict1 = torch.load(finetuned_model1_path)
 finetuned_state_dict2 = torch.load(finetuned_model2_path)
@@ -46,7 +48,7 @@ for name, param in finetuned_state_dict1.items():
         combined_state_dict[name] = alpha * param + (1 - alpha) * finetuned_state_dict2[name]
 
 # Copy model structure and save merged weights
-source_folder = os.path.join(base_path, "Only_Pretrain_1.5_MOE_2", args.task2, "llava-1.5-7b-lora")
+source_folder = os.path.join(base_path, args.temp_folder, args.task2, "llava-1.5-7b-lora")
 destination_folder = os.path.join(base_path, args.task2)
 target_model_folder = os.path.join(destination_folder, "llava-1.5-7b-lora")
 
