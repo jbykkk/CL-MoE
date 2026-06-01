@@ -7,6 +7,7 @@
 #   bash Eval_all.sh base blank
 #   bash Eval_all.sh finetune shuffle
 #   bash Eval_all.sh onefifth # eval 1/5-data CL-MoE
+#   bash Eval_all.sh onehalf # eval 1/2-data CL-MoE
 
 export CUDA_VISIBLE_DEVICES=0,1
 
@@ -25,6 +26,9 @@ if [ "$1" = "base" ]; then
 elif [ "$1" = "onefifth" ] || [ "$1" = "1_5" ]; then
     STAGE='Finetune_1_5'
     MODELPATH='/home/data1/lyk/Experiments/CL-MoE/checkpoints/CL4VQA_1_5/causal/llava-1.5-7b-lora'
+elif [ "$1" = "onehalf" ] || [ "$1" = "1_2" ]; then
+    STAGE='Finetune_1_2'
+    MODELPATH='/home/data1/lyk/Experiments/CL-MoE/checkpoints/CL4VQA_1_2/causal/llava-1.5-7b-lora'
 else
     STAGE='Finetune'
     MODELPATH='/home/data1/lyk/Experiments/CL-MoE/checkpoints/CL4VQA/causal/llava-1.5-7b-lora'

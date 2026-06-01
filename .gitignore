@@ -20,3 +20,5 @@ task.txt
 results/
 
 1.py
+
+*.DS_Store
