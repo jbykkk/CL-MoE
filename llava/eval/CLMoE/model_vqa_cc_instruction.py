@@ -33,6 +33,7 @@ def eval_model(args):
     model_path = os.path.expanduser(args.model_path)
     model_name = get_model_name_from_path(model_path)
     tokenizer, model, image_processor, context_len = load_pretrained_model(model_path, args.model_base, model_name)
+    model.eval()
 
     with open(os.path.expanduser(args.question_file), "r") as f:
         questions = json.load(f)
@@ -76,7 +77,7 @@ def eval_model(args):
                 top_p=args.top_p,
                 num_beams=args.num_beams,
                 # no_repeat_ngram_size=3,
-                max_new_tokens=1024,
+                max_new_tokens=args.max_new_tokens,
                 use_cache=True)
 
         input_token_len = input_ids.shape[1]
@@ -112,6 +113,7 @@ if __name__ == "__main__":
     parser.add_argument("--temperature", type=float, default=0)
     parser.add_argument("--top_p", type=float, default=None)
     parser.add_argument("--num_beams", type=int, default=1)
+    parser.add_argument("--max-new-tokens", type=int, default=16)
     
     args = parser.parse_args()
 

@@ -24,6 +24,19 @@ from .multimodal_projector.builder import build_vision_projector
 from llava.constants import IGNORE_INDEX, IMAGE_TOKEN_INDEX, DEFAULT_IMAGE_PATCH_TOKEN, DEFAULT_IM_START_TOKEN, DEFAULT_IM_END_TOKEN
 
 
+def load_mm_projector_state(module, state_dict):
+    """Load projector weights before or after DeepSpeed ZeRO-3 partitioning."""
+    parameters = list(module.parameters())
+    if parameters and any(hasattr(parameter, "ds_id") for parameter in parameters):
+        from deepspeed import zero
+
+        with zero.GatheredParameters(parameters, modifier_rank=0):
+            if not torch.distributed.is_initialized() or torch.distributed.get_rank() == 0:
+                module.load_state_dict(state_dict, strict=False)
+    else:
+        module.load_state_dict(state_dict, strict=False)
+
+
 class LlavaMetaModel:
 
     def __init__(self, config):
@@ -79,7 +92,10 @@ class LlavaMetaModel:
             def get_w(weights, keyword):
                 return {k.split(keyword + '.')[1]: v for k, v in weights.items() if keyword in k}
 
-            self.mm_projector.load_state_dict(get_w(mm_projector_weights, 'mm_projector'),strict = False)
+            load_mm_projector_state(
+                self.mm_projector,
+                get_w(mm_projector_weights, 'mm_projector'),
+            )
 
 
 class LlavaMetaForCausalLM(ABC):
@@ -282,4 +298,3 @@ class LlavaMetaForCausalLM(ABC):
                     p.requires_grad = False
                 for p in self.get_output_embeddings().parameters():
                     p.requires_grad = False
-

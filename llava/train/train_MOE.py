@@ -807,7 +807,9 @@ def train():
     parser = transformers.HfArgumentParser(
         (ModelArguments, DataArguments, TrainingArguments))
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()
-    with open("/public1/home/jzhou/hty/CLMoE/task.txt", "w") as t:
+    runtime_dir = os.path.abspath(os.environ.get("CLMOE_RUNTIME_DIR", os.getcwd()))
+    os.makedirs(runtime_dir, exist_ok=True)
+    with open(os.path.join(runtime_dir, "task.txt"), "w") as t:
         t.write(model_args.task)
     local_rank = training_args.local_rank
     compute_dtype = (torch.float16 if training_args.fp16 else (torch.bfloat16 if training_args.bf16 else torch.float32))
@@ -832,8 +834,17 @@ def train():
         ))
 
     if model_args.vision_tower is not None:
+        # The base LLaVA checkpoint can retain the original Hugging Face model
+        # ID in mm_vision_tower.  Override it before constructing the model so
+        # delayed vision-tower initialization also uses the requested local
+        # checkpoint instead of attempting a network lookup.
+        config = transformers.AutoConfig.from_pretrained(
+            model_args.model_name_or_path,
+            cache_dir=training_args.cache_dir,
+            trust_remote_code='mpt' in model_args.model_name_or_path,
+        )
+        config.mm_vision_tower = model_args.vision_tower
         if 'mpt' in model_args.model_name_or_path:
-            config = transformers.AutoConfig.from_pretrained(model_args.model_name_or_path, trust_remote_code=True)
             config.attn_config['attn_impl'] = training_args.mpt_attn_impl
             model = LlavaMPTForCausalLM.from_pretrained(
                 model_args.model_name_or_path,
@@ -844,6 +855,7 @@ def train():
         else:
             model = LlavaLlamaForCausalLM.from_pretrained(
                 model_args.model_name_or_path,
+                config=config,
                 cache_dir=training_args.cache_dir,
                 **bnb_model_from_pretrained_args,
             )
