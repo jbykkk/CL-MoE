@@ -1,0 +1,24 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.cache/
+dist/
+build/
+
+# Local models, datasets, and generated experiment artifacts.
+checkpoint/
+checkpoints/
+data/
+datasets/
+/UCIT/
+results/
+outputs/
+wandb/
+*.whl
+*.bin
+*.safetensors
+
+# CL-MoE router statistics are generated while training.
+index_*.txt
+value_counts_*.txt
+task.txt

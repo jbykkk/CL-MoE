@@ -1,0 +1,13 @@
+{
+  "benchmark": "UCIT",
+  "source": "Octopus/data/UCIT_instructions",
+  "image_root": "Octopus",
+  "tasks": [
+    {"id": 0, "name": "imagenet_r", "source_name": "ImageNet-R", "octopus_subset_samples": 9600, "full_train_samples": 23998, "metric": "accuracy"},
+    {"id": 1, "name": "arxivqa", "source_name": "ArxivQA", "octopus_subset_samples": 9600, "full_train_samples": 40000, "metric": "accuracy"},
+    {"id": 2, "name": "vizwiz", "source_name": "VizWiz", "octopus_subset_samples": 9600, "full_train_samples": 40000, "metric": "caption"},
+    {"id": 3, "name": "iconqa", "source_name": "IconQA", "octopus_subset_samples": 9600, "full_train_samples": 29859, "metric": "accuracy"},
+    {"id": 4, "name": "clevr_math", "source_name": "CLEVR-Math", "octopus_subset_samples": 16000, "full_train_samples": 40000, "metric": "accuracy"},
+    {"id": 5, "name": "flickr30k", "source_name": "Flickr30k", "octopus_subset_samples": 3200, "full_train_samples": 40000, "metric": "caption"}
+  ]
+}
